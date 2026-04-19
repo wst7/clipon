@@ -1,39 +1,19 @@
-import './StatusBar.css';
+import { Clipboard } from "lucide-react";
+
+const ICON_SIZE = 12;
 
 interface StatusBarProps {
   itemCount: number;
-  selectedCount: number;
-  filterText?: string;
 }
 
-export function StatusBar({ itemCount, selectedCount, filterText }: StatusBarProps) {
+export function StatusBar({ itemCount }: StatusBarProps) {
   return (
-    <footer className="status-bar">
-      <div className="status-left">
-        <span className="status-item">
-          <span className="status-icon">📋</span>
-          <span>共 {itemCount} 条记录</span>
-        </span>
-        {selectedCount > 0 && (
-          <span className="status-item selected">
-            <span className="status-icon">☑️</span>
-            <span>已选择 {selectedCount} 条</span>
-          </span>
-        )}
-        {filterText && (
-          <span className="status-item filtered">
-            <span className="status-icon">🔍</span>
-            <span>搜索: "{filterText}"</span>
-          </span>
-        )}
-      </div>
-
-      <div className="status-right">
-        <span className="status-item">
-          <span className="status-icon">💡</span>
-          <span className="hint-text">点击内容复制到剪切板</span>
-        </span>
-      </div>
+    <footer className="flex items-center justify-between px-4 py-2 bg-muted/50 border-t border-border">
+      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+        <Clipboard size={ICON_SIZE} />
+        <span>{itemCount} 条</span>
+      </span>
+      <span className="text-[11px] text-muted-foreground">就绪</span>
     </footer>
   );
 }

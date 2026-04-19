@@ -1,100 +1,44 @@
-import type { ClipboardFilter } from '../types/clipboard';
-import './SearchBar.css';
+/**
+ * 搜索栏组件
+ */
+import { Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+
+const ICON_SIZE = 14;
 
 interface SearchBarProps {
-  search: string;
-  onSearchChange: (search: string) => void;
-  filter: ClipboardFilter;
-  onFilterChange: (filter: Partial<ClipboardFilter>) => void;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
 }
 
 export function SearchBar({
-  search,
-  onSearchChange,
-  filter,
-  onFilterChange,
+  value,
+  onChange,
+  placeholder = "搜索...",
 }: SearchBarProps) {
   const handleClear = () => {
-    onSearchChange('');
+    onChange("");
   };
 
   return (
-    <div className="search-bar">
-      <div className="search-input-wrapper">
-        <span className="search-icon">🔍</span>
-        <input
-          type="text"
-          className="search-input"
-          placeholder="搜索剪切板内容..."
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
-        {search && (
-          <button className="clear-btn" onClick={handleClear} title="清除">
-            ✕
-          </button>
-        )}
-      </div>
-
-      <div className="filter-group">
-        <select
-          value={filter.type || 'all'}
-          onChange={(e) =>
-            onFilterChange({
-              type: e.target.value as 'text' | 'image' | 'file' | 'all',
-            })
-          }
-          className="filter-select"
+    <div className="relative w-full max-w-2xl mx-auto">
+      <Search size={ICON_SIZE} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+      <Input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="pl-9 pr-10 h-10 rounded-xl bg-background border border-input text-sm shadow-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      />
+      {value && (
+        <button
+          onClick={handleClear}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-muted text-muted-foreground"
         >
-          <option value="all">全部类型</option>
-          <option value="text">📄 文本</option>
-          <option value="image">🖼️ 图片</option>
-          <option value="file">📎 文件</option>
-        </select>
-
-        <label className="filter-checkbox">
-          <input
-            type="checkbox"
-            checked={filter.pinned || false}
-            onChange={(e) => onFilterChange({ pinned: e.target.checked })}
-          />
-          <span>📌 仅置顶</span>
-        </label>
-
-        <select
-          value={
-            filter.startDate
-              ? filter.startDate > Date.now() - 24 * 60 * 60 * 1000
-                ? 'today'
-                : 'week'
-              : 'all'
-          }
-          onChange={(e) => {
-            const value = e.target.value;
-            if (value === 'all') {
-              onFilterChange({ startDate: undefined, endDate: undefined });
-            } else if (value === 'today') {
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              onFilterChange({
-                startDate: today.getTime(),
-                endDate: Date.now(),
-              });
-            } else if (value === 'week') {
-              const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-              onFilterChange({
-                startDate: weekAgo,
-                endDate: Date.now(),
-              });
-            }
-          }}
-          className="filter-select"
-        >
-          <option value="all">📅 全部时间</option>
-          <option value="today">今天</option>
-          <option value="week">最近7天</option>
-        </select>
-      </div>
+          <X size={ICON_SIZE} />
+        </button>
+      )}
     </div>
   );
 }

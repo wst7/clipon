@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "873c67922d80775a9fdf596db7964b579f0408c30ec6e3d11989f6055bbec89f"
+    },
+    "tailwindcss-v4": {
+      "source": "fusengine/agents",
+      "sourceType": "github",
+      "computedHash": "739ebba57ce8deff298bdef76e1058b19545e6fdf6e7f9058d5ceb4f7cc93414"
+    },
+    "tauri-v2": {
+      "source": "nodnarbnitram/claude-code-extensions",
+      "sourceType": "github",
+      "computedHash": "377c61c46cf48c35b942042bc8abb9a039049a47f37d7f12b4f491d012777490"
+    }
+  }
+}
