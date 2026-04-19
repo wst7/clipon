@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "clipon",
+  "productName": "ClipMinister",
   "version": "0.1.0",
-  "identifier": "com.wstreet7.clipon",
+  "identifier": "com.wstreet7.clipminister",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Clipon",
+        "title": "ClipMinister",
         "width": 400,
         "height": 700,
         "minWidth": 600,
