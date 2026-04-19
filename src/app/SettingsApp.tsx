@@ -23,7 +23,7 @@ interface Settings {
 export function SettingsApp() {
   const [settings, setSettings] = useState<Settings>({
     language: "zh-CN",
-    theme: "light",
+    theme: "system",
     autostart: false,
     maxItems: 20,
   });
