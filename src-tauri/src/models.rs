@@ -37,7 +37,7 @@ pub struct Settings {
     pub language: String,
     pub theme: String,
     pub autostart: bool,
-    #[serde(rename = "maxItems")]
+    #[serde(rename = "max_items")]
     pub max_items: u32,
 }
 

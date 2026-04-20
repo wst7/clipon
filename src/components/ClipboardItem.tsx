@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Pin, Copy, Trash2 } from "lucide-react";
 import type { ClipboardItem } from "@/types/clipboard";
 
@@ -23,6 +24,7 @@ export function ClipboardItemCard({
   onDelete,
   onTogglePin,
 }: ClipboardItemCardProps) {
+  const { t } = useTranslation();
   const [showCopied, setShowCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
@@ -46,14 +48,14 @@ export function ClipboardItemCard({
       className={`group flex items-start gap-3 p-3 rounded-xl bg-card border border-border hover:border-ring hover:shadow-md transition-all cursor-pointer ${item.isPinned ? "ring-2 ring-primary/20" : ""}`}
       onClick={handleCopy}
       role="button"
-      aria-label="点击复制"
+      aria-label={t('copy')}
     >
       {item.isPinned && (
         <span className="self-start mt-1.5 size-1.5 rounded-full bg-amber-500 flex-shrink-0" />
       )}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1 mb-1">
-          {item.isPinned && <span className="px-2 py-0.5 text-xs rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">置顶</span>}
+          {item.isPinned && <span className="px-2 py-0.5 text-xs rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">{t('pinned')}</span>}
         </div>
         <div className="text-sm leading-tight line-clamp-2" title={item.content}>
           {compact ? truncate(item.content, 50) : truncate(item.content, 120)}
@@ -62,16 +64,16 @@ export function ClipboardItemCard({
 
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
         {showCopied ? (
-          <span className="text-xs text-green-600 font-medium">已复制</span>
+          <span className="text-xs text-green-600 font-medium">{t('copied')}</span>
         ) : (
-          <button onClick={handleCopy} className="p-1.5 rounded-lg hover:bg-muted" aria-label="复制">
+          <button onClick={handleCopy} className="p-1.5 rounded-lg hover:bg-muted" aria-label={t('copy')}>
             <Copy size={ICON_SIZE} className="text-muted-foreground" />
           </button>
         )}
-        <button onClick={handleTogglePin} className="p-1.5 rounded-lg hover:bg-muted" aria-label="置顶/取消置顶">
+        <button onClick={handleTogglePin} className="p-1.5 rounded-lg hover:bg-muted" aria-label={t('pin')}>
           <Pin size={ICON_SIZE} className={item.isPinned ? "text-amber-500" : "text-muted-foreground"} />
         </button>
-        <button onClick={handleDelete} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive" aria-label="删除">
+        <button onClick={handleDelete} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive" aria-label={t('delete')}>
           <Trash2 size={ICON_SIZE} />
         </button>
       </div>

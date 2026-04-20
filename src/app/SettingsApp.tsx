@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+import { Label, ListBox, Select, Switch } from "@heroui/react";
 import { RefreshCw } from "lucide-react";
 
 interface UpdateInfo {
@@ -17,15 +17,27 @@ interface Settings {
   language: string;
   theme: string;
   autostart: boolean;
-  maxItems: number;
+  max_items: number;
 }
 
+const languages = [
+  { id: "zh-CN", name: "简体中文" },
+  { id: "en-US", name: "English" },
+];
+
+const themes = [
+  { id: "system", name: "System" },
+  { id: "light", name: "Light" },
+  { id: "dark", name: "Dark" },
+];
+
 export function SettingsApp() {
+  const { t, i18n } = useTranslation();
   const [settings, setSettings] = useState<Settings>({
     language: "zh-CN",
     theme: "system",
     autostart: false,
-    maxItems: 20,
+    max_items: 20,
   });
   const [loading, setLoading] = useState(true);
   const [checkingUpdate, setCheckingUpdate] = useState(false);
@@ -64,11 +76,19 @@ export function SettingsApp() {
   const loadSettings = async () => {
     try {
       const data = await invoke<Settings>("get_settings");
-      console.log("loaded settings:", JSON.stringify(data));
-      setSettings(data);
-      applyTheme(data.theme);
+      console.log("后端返回的设置数据:", data);
+      setSettings({
+        language: data.language || "zh-CN",
+        theme: data.theme || "system",
+        autostart: data.autostart ?? false,
+        max_items: data.max_items ?? 20,
+      });
+      applyTheme(data.theme || "system");
+      if (data.language) {
+        i18n.changeLanguage(data.language === "zh-CN" ? "zh" : "en");
+      }
     } catch (error) {
-      console.error("加载设置失败:", error);
+      console.error("Failed to load settings:", error);
     } finally {
       setLoading(false);
     }
@@ -79,28 +99,34 @@ export function SettingsApp() {
       await invoke("save_settings", { settings: newSettings });
       applyTheme(newSettings.theme);
     } catch (error) {
-      console.error("保存设置失败:", error);
+      console.error("Failed to save settings:", error);
     }
   };
 
-  const handleLanguageChange = (language: string) => {
+  const handleLanguageChange = (key: React.Key | null) => {
+    if (!key) return;
+    const language = key as string;
     const newSettings = { ...settings, language };
     setSettings(newSettings);
+    i18n.changeLanguage(language === "zh-CN" ? "zh" : "en");
     saveSettings(newSettings);
   };
 
-  const handleThemeChange = (theme: string) => {
+  const handleThemeChange = (key: React.Key | null) => {
+    if (!key) return;
+    const theme = key as string;
     const newSettings = { ...settings, theme };
     setSettings(newSettings);
     saveSettings(newSettings);
   };
 
-  const handleAutostartChange = (autostart: boolean) => {
-    saveSettings({ ...settings, autostart });
+  const handleAutostartChange = (isSelected: boolean) => {
+    saveSettings({ ...settings, autostart: isSelected });
   };
 
-  const handleMaxItemsChange = (maxItems: number) => {
-    saveSettings({ ...settings, maxItems });
+  const handleMaxItemsChange = (value: string) => {
+    const max_items = Math.max(1, Math.min(500, parseInt(value) || 20));
+    saveSettings({ ...settings, max_items });
   };
 
   const checkForUpdate = async () => {
@@ -109,7 +135,7 @@ export function SettingsApp() {
       const info = await invoke<UpdateInfo>("check_update");
       setUpdateInfo(info);
     } catch (error) {
-      console.error("检查更新失败:", error);
+      console.error("Failed to check update:", error);
     } finally {
       setCheckingUpdate(false);
     }
@@ -121,123 +147,135 @@ export function SettingsApp() {
     }
   };
 
+  const selectedLanguage = languages.find((l) => l.id === settings.language);
+  const selectedTheme = themes.find((th) => th.id === settings.theme);
+
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
       <div className="px-6 py-4 bg-muted border-b border-border">
-        <h1 className="text-xl font-semibold">设置</h1>
-        <p className="text-sm text-muted-foreground">个性化应用行为</p>
+        <h1 className="text-xl font-semibold">{t('settings')}</h1>
+        <p className="text-sm text-muted-foreground">{t('customize')}</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        <section>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium">语言</h3>
-          </div>
-          {loading ? (
-            <div className="w-48 h-8 bg-muted animate-pulse rounded-md" />
-          ) : (
-            <Select value={settings.language} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="选择语言" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="zh-CN">简体中文</SelectItem>
-                <SelectItem value="en-US">English</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        </section>
+      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        <div className="grid gap-1.5">
+          <Label>{t('language')}</Label>
+          <Select
+            selectedKey={settings.language}
+            onSelectionChange={handleLanguageChange}
+            isDisabled={loading}
+            placeholder={t('selectLanguage')}
+          >
+            <Select.Trigger>
+              <Select.Value>
+                {selectedLanguage?.name || t('selectLanguage')}
+              </Select.Value>
+              <Select.Indicator />
+            </Select.Trigger>
+            <Select.Popover>
+              <ListBox>
+                {languages.map((lang) => (
+                  <ListBox.Item key={lang.id} id={lang.id} textValue={lang.name}>
+                    {lang.name}
+                  </ListBox.Item>
+                ))}
+              </ListBox>
+            </Select.Popover>
+          </Select>
+        </div>
 
-        <section>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium">主题</h3>
-          </div>
-          {loading ? (
-            <div className="w-48 h-8 bg-muted animate-pulse rounded-md" />
-          ) : (
-            <Select value={settings.theme} onValueChange={handleThemeChange}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="选择主题" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="system">跟随系统</SelectItem>
-                <SelectItem value="light">浅色</SelectItem>
-                <SelectItem value="dark">深色</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        </section>
+        <div className="grid gap-1.5">
+          <Label>{t('theme')}</Label>
+          <Select
+            selectedKey={settings.theme}
+            onSelectionChange={handleThemeChange}
+            isDisabled={loading}
+            placeholder={t('selectTheme')}
+          >
+            <Select.Trigger>
+              <Select.Value>
+                {selectedTheme?.name || t('selectTheme')}
+              </Select.Value>
+              <Select.Indicator />
+            </Select.Trigger>
+            <Select.Popover>
+              <ListBox>
+                {themes.map((theme) => (
+                  <ListBox.Item key={theme.id} id={theme.id} textValue={theme.name}>
+                    {theme.name}
+                  </ListBox.Item>
+                ))}
+              </ListBox>
+            </Select.Popover>
+          </Select>
+        </div>
 
-        <section className="flex items-center justify-between">
-          <div className="text-sm font-medium">开机自启动</div>
-          {loading ? (
-            <div className="w-10 h-5 bg-muted animate-pulse rounded-md" />
-          ) : (
-            <Switch
-              checked={settings.autostart}
-              onCheckedChange={handleAutostartChange}
-            />
-          )}
-        </section>
+        <div className="flex flex-row items-center justify-between">
+          <Label>{t('autoStart')}</Label>
+          <Switch
+            isSelected={settings.autostart}
+            onChange={handleAutostartChange}
+            isDisabled={loading}
+          >
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+          </Switch>
+        </div>
 
-        <section className="flex items-center justify-between">
-          <div className="text-sm font-medium">保存的最大数量</div>
-          {loading ? (
-            <div className="w-40 h-9 bg-muted animate-pulse rounded-md" />
-          ) : (
-            <input
-              type="number"
-              min={1}
-              max={500}
-              value={settings.maxItems}
-              onChange={(e) => handleMaxItemsChange(Math.max(1, Math.min(500, parseInt(e.target.value) || 20)))}
-              className="w-40 px-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          )}
-        </section>
+        <div className="flex flex-row items-center justify-between">
+          <Label>{t('maxItems')}</Label>
+          <input
+            type="number"
+            min={1}
+            max={500}
+            value={String(settings.max_items)}
+            onChange={(e) => handleMaxItemsChange(e.target.value)}
+            disabled={loading}
+            className="w-40 px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
 
-        <section>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium">检查更新</h3>
-          </div>
+        <div className="grid gap-1.5">
+          <Label>{t('checkUpdate')}</Label>
           {!updateInfo ? (
             <button
               onClick={checkForUpdate}
               disabled={checkingUpdate}
-              className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 text-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 text-sm w-fit"
             >
               <RefreshCw className={`w-4 h-4 ${checkingUpdate ? "animate-spin" : ""}`} />
-              {checkingUpdate ? "检查中..." : "检查更新"}
+              {checkingUpdate ? t('checking') : t('checkUpdate')}
             </button>
           ) : (
             <div className="space-y-2">
               <div className="text-sm">
-                当前版本: <span className="font-medium">{updateInfo.current_version}</span>
+                {t('currentVersion')}: <span className="font-medium">{updateInfo.current_version}</span>
               </div>
               {updateInfo.has_update ? (
                 <>
                   <div className="text-sm text-green-600">
-                    发现新版本: <span className="font-medium">{updateInfo.latest_version}</span>
+                    {t('newVersion')}: <span className="font-medium">{updateInfo.latest_version}</span>
                   </div>
                   <button
                     onClick={handleUpdate}
                     className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
                   >
-                    下载更新
+                    {t('download')}
                   </button>
                 </>
               ) : (
-                <div className="text-sm text-muted-foreground">已是最新版本</div>
+                <div className="text-sm text-muted-foreground">{t('upToDate')}</div>
               )}
               <button
                 onClick={() => setUpdateInfo(null)}
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
-                重新检查
+                {t('recheck')}
               </button>
             </div>
           )}
-        </section>
+        </div>
       </div>
     </div>
   );

@@ -1,30 +1,81 @@
 /**
- * 主窗口应用 - 重构后的样式，遵循 shadcn/ui 风格，完整暗黑支持
+ * 主窗口应用
  */
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { invoke } from "@tauri-apps/api/core";
 import { SearchBar } from "@/components/SearchBar";
 import { ClipboardList } from "@/components/ClipboardList";
 import { StatusBar } from "@/components/StatusBar";
 import { useClipboard } from "@/hooks/useClipboard";
-import { Switch } from "@/components/ui/switch";
-import { Clipboard } from "lucide-react";
+import { Switch } from "@heroui/react";
+import { Clipboard, Moon, Sun } from "lucide-react";
+
+interface Settings {
+  theme: string;
+}
 
 export function MainApp() {
+  const { t } = useTranslation();
   const { filteredItems, displayedPinned, displayedUnpinned, isLoading, search, setSearch, copyToClipboard, deleteItem, togglePin } = useClipboard();
 
-  // 暗黑模式开关状态
   const [isDark, setIsDark] = useState(false);
-  useEffect(() => {
+
+  const applyTheme = (theme: string) => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else if (theme === "light") {
+      document.documentElement.classList.remove("dark");
+    } else {
+      const isSystemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (isSystemDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
     setIsDark(document.documentElement.classList.contains("dark"));
+  };
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settings = await invoke<Settings>("get_settings");
+        applyTheme(settings.theme || "system");
+      } catch (error) {
+        console.error("Failed to load settings:", error);
+      }
+    };
+    loadSettings();
   }, []);
 
-  const toggleDarkMode = (val: boolean) => {
-    if (val) {
+  useEffect(() => {
+    if (isDark) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-    setIsDark(val);
+  }, [isDark]);
+
+  useEffect(() => {
+    const handleThemeChange = (e: MediaQueryListEvent) => {
+      const currentTheme = localStorage.getItem("theme");
+      if (currentTheme === "system") {
+        if (e.matches) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+        setIsDark(e.matches);
+      }
+    };
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    mediaQuery.addEventListener("change", handleThemeChange);
+    return () => mediaQuery.removeEventListener("change", handleThemeChange);
+  }, []);
+
+  const toggleDarkMode = (isSelected: boolean) => {
+    setIsDark(isSelected);
   };
 
   return (
@@ -33,17 +84,35 @@ export function MainApp() {
       <header className="sticky top-0 z-20 flex items-center justify-between px-4 py-3 border-b border-border bg-background shadow-sm">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Clipboard className="size-5 text-primary" />
-          <span className="text-lg">ClipOn</span>
+          <span className="text-lg">{t('appName')}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="whitespace-nowrap">暗黑</span>
-          <Switch checked={isDark} onCheckedChange={toggleDarkMode} />
+          <Switch
+            isSelected={isDark}
+            onChange={toggleDarkMode}
+          >
+            {({ isSelected }) => (
+              <>
+                <Switch.Control>
+                  <Switch.Thumb>
+                    <Switch.Icon>
+                      {isSelected ? (
+                        <Moon className="size-3" />
+                      ) : (
+                        <Sun className="size-3" />
+                      )}
+                    </Switch.Icon>
+                  </Switch.Thumb>
+                </Switch.Control>
+              </>
+            )}
+          </Switch>
         </div>
       </header>
 
       {/* 搜索条 */}
       <div className="px-4 py-3 border-b border-border bg-background">
-        <SearchBar value={search} onChange={setSearch} placeholder="搜索..." />
+        <SearchBar value={search} onChange={setSearch} placeholder={t('search')} />
       </div>
 
       {/* 内容区域 */}

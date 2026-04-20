@@ -2,7 +2,7 @@
  * 搜索栏组件
  */
 import { Search, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@heroui/react";
 
 const ICON_SIZE = 14;
 
@@ -23,7 +23,7 @@ export function SearchBar({
 
   return (
     <div className="relative w-full max-w-2xl mx-auto">
-      <Search size={ICON_SIZE} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+      <Search size={ICON_SIZE} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10" />
       <Input
         type="text"
         value={value}
