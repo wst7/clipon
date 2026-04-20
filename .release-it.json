@@ -86,7 +86,7 @@
     }
   },
   "hooks": {
-    "before:commit": [
+    "after:bump": [
       "git add src-tauri/Cargo.lock"
     ],
     "after:release": "echo Successfully released v${version}."
