@@ -39,7 +39,7 @@ const themes = [
 
 export function MainApp() {
   const { t, i18n } = useTranslation();
-  const { filteredItems, displayedPinned, displayedUnpinned, isLoading, search, setSearch, copyToClipboard, deleteItem, togglePin } = useClipboard();
+  const { displayedPinned, displayedUnpinned, isLoading, search, setSearch, copyToClipboard, deleteItem, togglePin } = useClipboard();
 
   const [activeTab, setActiveTab] = useState("clips");
   const [settings, setSettings] = useState<SettingsData>({
