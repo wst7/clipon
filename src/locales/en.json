@@ -25,5 +25,7 @@
   "system": "System",
   "light": "Light",
   "dark": "Dark",
-  "customize": "Customize your app"
+  "customize": "Customize your app",
+  "clips": "Clips",
+  "about": "About"
 }

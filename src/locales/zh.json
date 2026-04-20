@@ -25,5 +25,7 @@
   "selectTheme": "选择主题",
   "system": "跟随系统",
   "light": "浅色",
-  "customize": "个性化设置"
+  "customize": "个性化设置",
+  "clips": "剪贴板",
+  "about": "关于"
 }

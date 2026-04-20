@@ -1,0 +1,31 @@
+{
+  "git": {
+    "commitMessage": "chore: release v${version}",
+    "tagAnnotation": "Release v${version}",
+    "push": true,
+    "tagName": "v${version}"
+  },
+  "github": {
+    "release": true,
+    "releaseName": "v${version}",
+    "draft": false,
+    "preRelease": false,
+    "autoGenerate": true
+  },
+  "npm": {
+    "publish": false
+  },
+  "plugins": {
+    "@release-it/conventional-changelog": {
+      "preset": "angular",
+      "infile": "CHANGELOG.md"
+    },
+    "@release-it/bumper": {
+      "out": [
+        "package.json",
+        "src-tauri/Cargo.toml:package.version",
+        "src-tauri/tauri.conf.json:version"
+      ]
+    }
+  }
+}

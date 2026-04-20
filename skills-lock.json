@@ -11,11 +11,6 @@
       "sourceType": "github",
       "computedHash": "c9e1bb41fbc3cee782faae08bd465ae05cd685a6ed7cc3392464fdf29b3ab467"
     },
-    "shadcn": {
-      "source": "shadcn/ui",
-      "sourceType": "github",
-      "computedHash": "873c67922d80775a9fdf596db7964b579f0408c30ec6e3d11989f6055bbec89f"
-    },
     "tailwindcss-v4": {
       "source": "fusengine/agents",
       "sourceType": "github",

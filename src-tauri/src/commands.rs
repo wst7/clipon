@@ -194,6 +194,16 @@ pub async fn check_update() -> Result<UpdateInfo, String> {
         .await
         .map_err(|e| e.to_string())?;
 
+    if response.status() == reqwest::StatusCode::NOT_FOUND {
+        return Ok(UpdateInfo {
+            has_update: false,
+            current_version: current_version.clone(),
+            latest_version: current_version,
+            download_url: "https://github.com/wstreet7/clipon/releases".to_string(),
+            release_notes: None,
+        });
+    }
+
     if !response.status().is_success() {
         return Err("Failed to fetch release info".to_string());
     }

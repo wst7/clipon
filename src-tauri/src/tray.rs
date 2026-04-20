@@ -2,7 +2,7 @@ use tauri::image::Image;
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::Emitter;
-use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri::{AppHandle, Manager};
 
 pub fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let app_handle = app.handle();
@@ -39,14 +39,11 @@ pub fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         .on_menu_event(|app_handle, event| {
             let id = event.id().as_ref();
             match id {
-                "show" => {
+                "preferences" => {
                     if let Some(window) = app_handle.get_webview_window("main") {
                         let _ = window.show();
                         let _ = window.set_focus();
                     }
-                }
-                "settings" => {
-                    open_settings_window(app_handle);
                 }
                 "clear" => {
                     clear_all_items(app_handle);
@@ -133,13 +130,9 @@ fn build_tray_menu(app_handle: &AppHandle) -> Result<Menu<tauri::Wry>, Box<dyn s
         menu.append(&PredefinedMenuItem::separator(app_handle)?)?;
     }
 
-    // 主窗口
-    let show_item = MenuItem::with_id(app_handle, "show", "显示主窗口", true, None::<&str>)?;
-    menu.append(&show_item)?;
-
-    // 设置
-    let settings_item = MenuItem::with_id(app_handle, "settings", "设置", true, None::<&str>)?;
-    menu.append(&settings_item)?;
+    // 偏好设置
+    let preferences_item = MenuItem::with_id(app_handle, "preferences", "Preferences", true, None::<&str>)?;
+    menu.append(&preferences_item)?;
 
     // 分隔线
     menu.append(&PredefinedMenuItem::separator(app_handle)?)?;
@@ -182,26 +175,7 @@ fn copy_item_to_clipboard(app_handle: &AppHandle, item_id: &str) {
     }
 }
 
-fn open_settings_window(app_handle: &AppHandle) {
-    // 检查设置窗口是否已存在
-    if let Some(window) = app_handle.get_webview_window("settings") {
-        let _ = window.show();
-        let _ = window.set_focus();
-        return;
-    }
 
-    // 创建设置窗口
-    let _settings_window = WebviewWindowBuilder::new(
-        app_handle,
-        "settings",
-        WebviewUrl::App("index.html?settings=true".into()),
-    )
-    .title("ClipOn - 设置")
-    .inner_size(450.0, 750.0)
-    .resizable(true)
-    .center()
-    .build();
-}
 
 fn clear_all_items(app_handle: &AppHandle) {
     let state = app_handle.state::<crate::models::AppState>();
