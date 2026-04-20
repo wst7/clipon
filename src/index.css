@@ -3,6 +3,50 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+  --background: #ffffff;
+  --foreground: #0f0f0f;
+  --card: #ffffff;
+  --card-foreground: #0f0f0f;
+  --popover: #ffffff;
+  --popover-foreground: #0f0f0f;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #0f0f0f;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #0f0f0f;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #3b82f6;
+}
+
+.dark {
+  --background: #1e1e2e;
+  --foreground: #fafafa;
+  --card: #27273a;
+  --card-foreground: #fafafa;
+  --popover: #27273a;
+  --popover-foreground: #fafafa;
+  --primary: #60a5fa;
+  --primary-foreground: #0f172a;
+  --secondary: #313244;
+  --secondary-foreground: #fafafa;
+  --muted: #313244;
+  --muted-foreground: #d4d4d8;
+  --accent: #313244;
+  --accent-foreground: #fafafa;
+  --destructive: #f87171;
+  --destructive-foreground: #1f2937;
+  --border: #45475a;
+  --input: #45475a;
+  --ring: #60a5fa;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -35,4 +79,12 @@
     font-size: 0.875rem;
     line-height: 1.25rem;
   }
+}
+
+/* Tabs 样式覆盖 */
+.tabs__tab {
+  color: var(--color-muted-foreground) !important;
+}
+.tabs__tab[aria-selected="true"] {
+  color: var(--color-foreground) !important;
 }

@@ -2,6 +2,7 @@
  * 主窗口应用 - 合并设置和剪贴板管理
  */
 import { useEffect, useState } from "react";
+import packageInfo from '../../package.json' with { type: 'json' };
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
@@ -166,6 +167,9 @@ export function MainApp() {
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(String(key))}
           className="px-4"
+          classNames={{
+            tab: "text-foreground",
+          }}
         >
           <Tabs.ListContainer>
             <Tabs.List aria-label="Navigation">
@@ -304,59 +308,66 @@ export function MainApp() {
 
         {/* 关于标签页 */}
         {activeTab === "about" && (
-          <div className="h-full overflow-y-auto p-4 space-y-6">
-            <div className="text-center py-4">
-              <div className="w-16 h-16 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center">
-                <ClipboardListIcon className="size-8 text-primary" />
-              </div>
-              <h2 className="text-xl font-semibold">{t('appName')}</h2>
-              <p className="text-sm text-muted-foreground">v0.1.0</p>
-            </div>
-
-            <div className="grid gap-1.5">
-              <Label>{t('checkUpdate')}</Label>
-              {!updateInfo ? (
-                <button
-                  onClick={checkForUpdate}
-                  disabled={checkingUpdate}
-                  className="flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 text-sm w-fit"
-                >
-                  <RefreshCw className={`w-4 h-4 ${checkingUpdate ? "animate-spin" : ""}`} />
-                  {checkingUpdate ? t('checking') : t('checkUpdate')}
-                </button>
-              ) : (
-                <div className="space-y-2">
-                  <div className="text-sm">
-                    {t('currentVersion')}: <span className="font-medium">{updateInfo.current_version}</span>
-                  </div>
-                  {updateInfo.has_update ? (
-                    <>
-                      <div className="text-sm text-green-600">
-                        {t('newVersion')}: <span className="font-medium">{updateInfo.latest_version}</span>
-                      </div>
-                      <button
-                        onClick={handleUpdate}
-                        className="px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm"
-                      >
-                        {t('download')}
-                      </button>
-                    </>
-                  ) : (
-                    <div className="text-sm text-muted-foreground">{t('upToDate')}</div>
-                  )}
-                  <button
-                    onClick={() => setUpdateInfo(null)}
-                    className="text-sm text-muted-foreground hover:text-foreground"
-                  >
-                    {t('recheck')}
-                  </button>
+          <div className="h-full overflow-y-auto">
+            <div className="max-w-sm mx-auto p-6 space-y-8">
+              {/* Logo & 标题 */}
+              <div className="text-center">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                  <ClipboardListIcon className="size-10 text-primary" />
                 </div>
-              )}
-            </div>
+                <h2 className="text-2xl font-bold">{t('appName')}</h2>
+                <p className="text-muted-foreground mt-1">v{packageInfo.version}</p>
+                <p className="text-sm text-muted-foreground mt-2">Lightweight clipboard manager</p>
+              </div>
 
-            <div className="text-sm text-muted-foreground pt-4">
-              <p>ClipOn - 轻量级剪贴板管理工具</p>
-              <p className="mt-2">© 2025 ClipOn. All rights reserved.</p>
+              {/* 版本检查 */}
+              <div className="bg-card rounded-xl p-4 shadow-sm border border-border">
+                <h3 className="font-medium mb-3">{t('checkUpdate')}</h3>
+                {!updateInfo ? (
+                  <button
+                    onClick={checkForUpdate}
+                    disabled={checkingUpdate}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 text-sm w-full justify-center transition-colors"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${checkingUpdate ? "animate-spin" : ""}`} />
+                    {checkingUpdate ? t('checking') : t('checkUpdate')}
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">{t('currentVersion')}</span>
+                      <span className="font-medium">{updateInfo.current_version}</span>
+                    </div>
+                    {updateInfo.has_update ? (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-green-500">{t('newVersion')}</span>
+                          <span className="font-medium text-green-500">{updateInfo.latest_version}</span>
+                        </div>
+                        <button
+                          onClick={handleUpdate}
+                          className="w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-sm transition-colors"
+                        >
+                          {t('download')}
+                        </button>
+                      </>
+                    ) : (
+                      <div className="text-center text-sm text-muted-foreground py-2">{t('upToDate')}</div>
+                    )}
+                    <button
+                      onClick={() => setUpdateInfo(null)}
+                      className="w-full text-sm text-muted-foreground hover:text-foreground py-1 transition-colors"
+                    >
+                      {t('recheck')}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* 版权 */}
+              <div className="text-center text-xs text-muted-foreground pt-4">
+                <p>© 2025 ClipOn. All rights reserved.</p>
+              </div>
             </div>
           </div>
         )}
