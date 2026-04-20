@@ -1,9 +1,11 @@
 {
+  "$schema": "https://unpkg.com/release-it@19/schema/release-it.json",
   "git": {
-    "commitMessage": "chore: release v${version}",
-    "tagAnnotation": "Release v${version}",
-    "push": true,
-    "tagName": "v${version}"
+    "tagName": "v${version}",
+    "requireCleanWorkingDir": false,
+    "commitMessage": "chore: release ${version}",
+    "tagAnnotation": "Release ${version}",
+    "push": true
   },
   "github": {
     "release": true,
@@ -12,14 +14,8 @@
     "preRelease": false,
     "autoGenerate": true
   },
-  "npm": {
-    "publish": false
-  },
+  "npm": false,
   "plugins": {
-    "@release-it/conventional-changelog": {
-      "preset": "angular",
-      "infile": "CHANGELOG.md"
-    },
     "@release-it/bumper": {
       "in": "package.json",
       "out": [
@@ -27,6 +23,66 @@
         "src-tauri/Cargo.toml",
         "src-tauri/tauri.conf.json"
       ]
+    },
+    "@release-it/conventional-changelog": {
+      "preset": {
+        "name": "conventionalcommits",
+        "types": [
+          {
+            "type": "feat",
+            "section": "✨ Features | 新功能"
+          },
+          {
+            "type": "fix",
+            "section": "🐛 Bug Fixes | Bug 修复"
+          },
+          {
+            "type": "chore",
+            "section": "🎫 Chores | 其他更新",
+            "hidden": true
+          },
+          {
+            "type": "docs",
+            "section": "📝 Documentation | 文档",
+            "hidden": true
+          },
+          {
+            "type": "style",
+            "section": "💄 Styles | 风格",
+            "hidden": true
+          },
+          {
+            "type": "refactor",
+            "section": "♻️ Code Refactoring | 代码重构",
+            "hidden": true
+          },
+          {
+            "type": "perf",
+            "section": "⚡️ Performance Improvements | 性能优化"
+          },
+          {
+            "type": "test",
+            "section": "✅ Tests | 测试",
+            "hidden": true
+          },
+          {
+            "type": "revert",
+            "section": "⏪ Reverts | 回退",
+            "hidden": true
+          },
+          {
+            "type": "build",
+            "section": "👷‍ Build System | 构建",
+            "hidden": true
+          },
+          {
+            "type": "ci",
+            "section": "🔧 Continuous Integration | CI 配置",
+            "hidden": true
+          }
+        ]
+      },
+      "infile": "CHANGELOG.md"
     }
   }
 }
