@@ -33,7 +33,7 @@ export function MainApp() {
       <header className="sticky top-0 z-20 flex items-center justify-between px-4 py-3 border-b border-border bg-background shadow-sm">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Clipboard className="size-5 text-primary" />
-          <span className="text-lg">ClipMinister</span>
+          <span className="text-lg">ClipOn</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span className="whitespace-nowrap">暗黑</span>

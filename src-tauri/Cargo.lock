@@ -506,7 +506,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "clipminister"
+name = "clipon"
 version = "0.1.0"
 dependencies = [
  "arboard",

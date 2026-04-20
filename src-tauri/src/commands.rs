@@ -189,7 +189,7 @@ pub async fn check_update() -> Result<UpdateInfo, String> {
     let client = reqwest::Client::new();
     let response = client
         .get("https://api.github.com/repos/wstreet7/clipon/releases/latest")
-        .header("User-Agent", "ClipMinister")
+        .header("User-Agent", "ClipOn")
         .send()
         .await
         .map_err(|e| e.to_string())?;

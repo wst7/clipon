@@ -12,9 +12,11 @@ pub fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 
     // 创建托盘图标
     let _tray = TrayIconBuilder::with_id("main")
-        .icon(Image::from_bytes(include_bytes!("../icons/icon.png"))?)
+        .icon(Image::from_bytes(include_bytes!(
+            "../icons/tray/16x16.png"
+        ))?)
         .menu(&menu)
-        .tooltip("ClipMinister - 剪贴板管理")
+        .tooltip("ClipOn - 剪贴板管理")
         .show_menu_on_left_click(true)
         .on_tray_icon_event(|tray, event| match event {
             TrayIconEvent::Click {
@@ -194,7 +196,7 @@ fn open_settings_window(app_handle: &AppHandle) {
         "settings",
         WebviewUrl::App("index.html?settings=true".into()),
     )
-    .title("ClipMinister - 设置")
+    .title("ClipOn - 设置")
     .inner_size(450.0, 750.0)
     .resizable(true)
     .center()
@@ -226,7 +228,7 @@ fn send_notification(app_handle: &AppHandle, message: &str) {
     let _ = app_handle
         .notification()
         .builder()
-        .title("ClipMinister")
+        .title("ClipOn")
         .body(message)
         .show();
 }
