@@ -67,10 +67,16 @@ export default function MainApp() {
     const isDark =
       theme === "dark" ||
       (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const html = document.documentElement;
+
     if (isDark) {
-      document.documentElement.classList.add("dark");
+      html.classList.add("dark");
+      html.classList.remove("light");
+      html.setAttribute("data-theme", "dark");
     } else {
-      document.documentElement.classList.remove("dark");
+      html.classList.remove("dark");
+      html.classList.add("light");
+      html.setAttribute("data-theme", "light");
     }
   };
 
