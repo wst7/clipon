@@ -27,5 +27,9 @@
   "light": "浅色",
   "customize": "个性化设置",
   "clips": "剪贴板",
-  "about": "关于"
+  "about": "关于",
+  "downloading": "下载中...",
+  "downloadUpdate": "下载更新",
+  "installUpdate": "安装更新",
+  "downloadFailed": "下载失败，请重试"
 }

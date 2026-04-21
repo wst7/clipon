@@ -27,5 +27,9 @@
   "dark": "Dark",
   "customize": "Customize your app",
   "clips": "Clips",
-  "about": "About"
+  "about": "About",
+  "downloading": "Downloading...",
+  "downloadUpdate": "Download Update",
+  "installUpdate": "Install Update",
+  "downloadFailed": "Download failed, please retry"
 }
