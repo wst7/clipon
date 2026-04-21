@@ -4,6 +4,11 @@ pub mod models;
 pub mod storage;
 pub mod tray;
 
+#[macro_use]
+extern crate rust_i18n;
+
+i18n!("locales");
+
 use models::AppState;
 use tauri::Manager;
 
@@ -21,6 +26,9 @@ pub fn run() {
             let data_dir = storage::get_data_dir(&app.handle());
             let clipboard_items = storage::load_clipboard_data(&data_dir);
             let settings = storage::load_settings(&data_dir);
+
+            // 设置语言
+            rust_i18n::set_locale(&settings.language);
 
             app.manage(AppState {
                 clipboard_items: std::sync::Mutex::new(clipboard_items),

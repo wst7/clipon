@@ -28,14 +28,14 @@ interface SettingsData {
 }
 
 const languages = [
-  { id: "zh-CN", name: "简体中文" },
-  { id: "en-US", name: "English" },
+  { id: "zh", name: "简体中文" },
+  { id: "en", name: "English" },
 ];
 
-const themes = [
-  { id: "system", name: "System" },
-  { id: "light", name: "Light" },
-  { id: "dark", name: "Dark" },
+const themes = (t: (key: string) => string) => [
+  { id: "system", name: t("system") },
+  { id: "light", name: t("light") },
+  { id: "dark", name: t("dark") },
 ];
 
 export default function MainApp() {
@@ -44,7 +44,7 @@ export default function MainApp() {
 
   const [activeTab, setActiveTab] = useState("clips");
   const [settings, setSettings] = useState<SettingsData>({
-    language: "zh-CN",
+    language: "zh",
     theme: "system",
     autostart: false,
     max_items: 20,
@@ -87,14 +87,14 @@ export default function MainApp() {
     try {
       const data = await invoke<SettingsData>("get_settings");
       setSettings({
-        language: data.language || "zh-CN",
+        language: data.language || "zh",
         theme: data.theme || "system",
         autostart: data.autostart ?? false,
         max_items: data.max_items ?? 20,
       });
       applyTheme(data.theme || "system");
       if (data.language) {
-        i18n.changeLanguage(data.language === "zh-CN" ? "zh" : "en");
+        i18n.changeLanguage(data.language === "zh" ? "zh" : "en");
       }
     } catch (error) {
       console.error("Failed to load settings:", error);
@@ -117,7 +117,7 @@ export default function MainApp() {
     const language = key as string;
     const newSettings = { ...settings, language };
     setSettings(newSettings);
-    i18n.changeLanguage(language === "zh-CN" ? "zh" : "en");
+    i18n.changeLanguage(language === "zh" ? "zh" : "en");
     saveSettings(newSettings);
   };
 
@@ -157,7 +157,8 @@ export default function MainApp() {
   };
 
   const selectedLanguage = languages.find((l) => l.id === settings.language);
-  const selectedTheme = themes.find((th) => th.id === settings.theme);
+  const themeOptions = themes(t);
+  const selectedTheme = themeOptions.find((th) => th.id === settings.theme);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -265,7 +266,7 @@ export default function MainApp() {
                 </Select.Trigger>
                 <Select.Popover>
                   <ListBox>
-                    {themes.map((theme) => (
+                    {themeOptions.map((theme) => (
                       <ListBox.Item key={theme.id} id={theme.id} textValue={theme.name}>
                         {theme.name}
                       </ListBox.Item>

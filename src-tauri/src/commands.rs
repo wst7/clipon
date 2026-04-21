@@ -149,8 +149,14 @@ pub fn save_settings(
 
     *current_settings = settings.clone();
 
+    // 更新语言环境
+    rust_i18n::set_locale(&settings.language);
+
     let data_dir = state.data_dir.lock().map_err(|e| e.to_string())?;
     storage::save_settings_to_file(&data_dir, &settings)?;
+
+    // 刷新托盘菜单（语言可能已更改）
+    crate::tray::tray_menu_display(&app_handle);
 
     Ok(())
 }

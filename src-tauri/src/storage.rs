@@ -95,3 +95,100 @@ pub fn save_settings_to_file(data_dir: &Path, settings: &Settings) -> Result<(),
         Err(e) => Err(format!("Failed to write settings file: {}", e)),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::TempDir;
+
+    fn create_temp_dir() -> TempDir {
+        tempfile::tempdir().unwrap()
+    }
+
+    #[test]
+    fn test_get_data_file_path() {
+        let temp_dir = create_temp_dir();
+        let path = get_data_file_path(temp_dir.path());
+        assert!(path.ends_with("clipboard_data.json"));
+    }
+
+    #[test]
+    fn test_get_settings_file_path() {
+        let temp_dir = create_temp_dir();
+        let path = get_settings_file_path(temp_dir.path());
+        assert!(path.ends_with("settings.json"));
+    }
+
+    #[test]
+    fn test_load_clipboard_data_empty_dir() {
+        let temp_dir = create_temp_dir();
+        let items = load_clipboard_data(temp_dir.path());
+        assert!(items.is_empty());
+    }
+
+    #[test]
+    fn test_save_and_load_clipboard_data() {
+        let temp_dir = create_temp_dir();
+        let items = vec![
+            ClipboardItem::new("item 1".to_string(), "text"),
+            ClipboardItem::new("item 2".to_string(), "text"),
+        ];
+
+        save_clipboard_data(temp_dir.path(), &items).unwrap();
+
+        let loaded = load_clipboard_data(temp_dir.path());
+        assert_eq!(loaded.len(), 2);
+        assert_eq!(loaded[0].content, "item 1");
+        assert_eq!(loaded[1].content, "item 2");
+    }
+
+    #[test]
+    fn test_load_settings_default() {
+        let temp_dir = create_temp_dir();
+        let settings = load_settings(temp_dir.path());
+        assert_eq!(settings.language, "zh");
+        assert_eq!(settings.theme, "system");
+    }
+
+    #[test]
+    fn test_save_and_load_settings() {
+        let temp_dir = create_temp_dir();
+        let settings = Settings {
+            language: "en".to_string(),
+            theme: "dark".to_string(),
+            autostart: true,
+            max_items: 50,
+        };
+
+        save_settings_to_file(temp_dir.path(), &settings).unwrap();
+
+        let loaded = load_settings(temp_dir.path());
+        assert_eq!(loaded.language, "en");
+        assert_eq!(loaded.theme, "dark");
+        assert!(loaded.autostart);
+        assert_eq!(loaded.max_items, 50);
+    }
+
+    #[test]
+    fn test_load_settings_invalid_file() {
+        let temp_dir = create_temp_dir();
+        // Write invalid JSON
+        fs::write(temp_dir.path().join("settings.json"), "invalid json").unwrap();
+
+        let settings = load_settings(temp_dir.path());
+        // Should return default settings
+        assert_eq!(settings.language, "zh");
+    }
+
+    #[test]
+    fn test_save_clipboard_data_empty() {
+        let temp_dir = create_temp_dir();
+        let items: Vec<ClipboardItem> = vec![];
+
+        save_clipboard_data(temp_dir.path(), &items).unwrap();
+
+        let loaded = load_clipboard_data(temp_dir.path());
+        assert!(loaded.is_empty());
+    }
+}

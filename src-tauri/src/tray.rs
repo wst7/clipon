@@ -4,6 +4,8 @@ use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent}
 use tauri::Emitter;
 use tauri::{AppHandle, Manager};
 
+use rust_i18n::t;
+
 pub fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let app_handle = app.handle();
 
@@ -67,8 +69,9 @@ pub fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
 fn build_tray_menu(app_handle: &AppHandle) -> Result<Menu<tauri::Wry>, Box<dyn std::error::Error>> {
     let menu = Menu::new(app_handle)?;
 
-    // 获取历史记录
     let state = app_handle.state::<crate::models::AppState>();
+
+    // 获取历史记录
     let items = state.clipboard_items.lock().unwrap();
 
     // 排序：置顶在前，时间倒序
@@ -89,7 +92,7 @@ fn build_tray_menu(app_handle: &AppHandle) -> Result<Menu<tauri::Wry>, Box<dyn s
         let history_title = MenuItem::with_id(
             app_handle,
             "history_title",
-            "=== 历史记录 ===",
+            t!("tray.history_title"),
             false,
             None::<&str>,
         )?;
@@ -125,24 +128,24 @@ fn build_tray_menu(app_handle: &AppHandle) -> Result<Menu<tauri::Wry>, Box<dyn s
         menu.append(&PredefinedMenuItem::separator(app_handle)?)?;
     } else {
         // 无历史记录
-        let empty_item = MenuItem::with_id(app_handle, "empty", "无历史记录", false, None::<&str>)?;
+        let empty_item = MenuItem::with_id(app_handle, "empty", t!("tray.no_history"), false, None::<&str>)?;
         menu.append(&empty_item)?;
         menu.append(&PredefinedMenuItem::separator(app_handle)?)?;
     }
 
     // 偏好设置
-    let preferences_item = MenuItem::with_id(app_handle, "preferences", "Preferences", true, None::<&str>)?;
+    let preferences_item = MenuItem::with_id(app_handle, "preferences", t!("tray.preferences"), true, None::<&str>)?;
     menu.append(&preferences_item)?;
 
     // 分隔线
     menu.append(&PredefinedMenuItem::separator(app_handle)?)?;
 
     // 清除
-    let clear_item = MenuItem::with_id(app_handle, "clear", "清空历史", true, None::<&str>)?;
+    let clear_item = MenuItem::with_id(app_handle, "clear", t!("tray.clear_history"), true, None::<&str>)?;
     menu.append(&clear_item)?;
 
     // 退出
-    let quit_item = MenuItem::with_id(app_handle, "quit", "退出", true, None::<&str>)?;
+    let quit_item = MenuItem::with_id(app_handle, "quit", t!("tray.quit"), true, None::<&str>)?;
     menu.append(&quit_item)?;
 
     Ok(menu)
@@ -179,6 +182,7 @@ fn copy_item_to_clipboard(app_handle: &AppHandle, item_id: &str) {
 
 fn clear_all_items(app_handle: &AppHandle) {
     let state = app_handle.state::<crate::models::AppState>();
+
     let mut items = state.clipboard_items.lock().unwrap();
     items.clear();
 
@@ -194,7 +198,7 @@ fn clear_all_items(app_handle: &AppHandle) {
     // 通知前端清空
     let _ = app_handle.emit("clipboard-cleared", ());
 
-    send_notification(app_handle, "已清空历史记录");
+    send_notification(app_handle, &t!("tray.history_cleared"));
 }
 
 fn send_notification(app_handle: &AppHandle, message: &str) {
