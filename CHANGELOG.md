@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://github.com/wst7/clipon/compare/v1.2.0...v1.3.0) (2026-04-21)
+
+### ✨ Features | 新功能
+
+* add download progress UI and state management ([d149a0d](https://github.com/wst7/clipon/commit/d149a0d99b07535fdbd4f23f4e77c6b9669d2017))
+* add in-app download and installer opening commands ([b74642f](https://github.com/wst7/clipon/commit/b74642fc93e78f3138291632a50686d95e6b8e1a))
+
+### 🐛 Bug Fixes | Bug 修复
+
+* correct GitHub repo URL and UI improvements ([3d7fd0f](https://github.com/wst7/clipon/commit/3d7fd0f39a7fc7a750e9b7c3ab5bd91ace9f0ee4))
+* use consistent GitHub repo URL (wst7) ([b81643c](https://github.com/wst7/clipon/commit/b81643ce3c4f84df1124fd0897ea53ceb1a21500))
+* use streaming download with incremental progress updates ([1c3aa0b](https://github.com/wst7/clipon/commit/1c3aa0bc345847ab289842eef2d05181f07f8342))
+
 ## [1.2.0](https://github.com/wst7/clipon/compare/v1.1.0...v1.2.0) (2026-04-21)
 
 ### ✨ Features | 新功能
