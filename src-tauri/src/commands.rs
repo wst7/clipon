@@ -262,20 +262,13 @@ fn compare_versions(current: &str, latest: &str) -> std::cmp::Ordering {
 
 fn find_asset_for_platform(release: &GitHubRelease) -> Option<&GitHubAsset> {
     let os = std::env::consts::OS;
-    let arch = std::env::consts::ARCH;
 
     release.assets.iter().find(|asset| {
         match os {
             "macos" => {
-                // Match .dmg and correct architecture
-                if !asset.name.ends_with(".dmg") {
-                    return false;
-                }
-                match arch {
-                    "aarch64" => asset.name.contains("_aarch64"),
-                    "x86_64" => asset.name.contains("_x64"),
-                    _ => true, // fall back to any .dmg if arch unknown
-                }
+                // Prefer x64 (Intel) build because unsigned aarch64 gets quarantine error on macOS
+                // Universal Rosetta 2 works fine on Apple Silicon
+                asset.name.ends_with("_x64.dmg") || asset.name.ends_with(".dmg")
             }
             "windows" => asset.name.ends_with(".exe") || asset.name.ends_with(".msi"),
             "linux" => {
