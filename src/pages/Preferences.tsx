@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { listen } from '@tauri-apps/api/event';
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { SearchBar } from "@/components/SearchBar";
 import { ClipboardList } from "@/components/ClipboardList";
 import { useClipboard } from "@/hooks/useClipboard";
@@ -68,6 +69,23 @@ export default function MainApp() {
       theme === "dark" ||
       (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     const html = document.documentElement;
+
+    const currentWindow = getCurrentWindow();
+    if (typeof (currentWindow as any).setTitleBarOverlay === 'function') {
+      if (isDark) {
+        // 深色主题 - 标题栏使用亮色标题文字和红绿灯
+        (currentWindow as any).setTitleBarOverlay({
+          color: "#00000000",
+          symbolColor: "#ffffff"
+        });
+      } else {
+        // 浅色主题 - 标题栏使用暗色标题文字和红绿灯
+        (currentWindow as any).setTitleBarOverlay({
+          color: "#00000000",
+          symbolColor: "#000000"
+        });
+      }
+    }
 
     if (isDark) {
       html.classList.add("dark");
