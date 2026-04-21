@@ -211,7 +211,7 @@ pub async fn check_update() -> Result<UpdateInfo, String> {
 
     let client = reqwest::Client::new();
     let response = client
-        .get("https://api.github.com/repos/wstreet7/clipon/releases/latest")
+        .get("https://api.github.com/repos/wst7/clipon/releases/latest")
         .header("User-Agent", "ClipOn")
         .send()
         .await
@@ -222,7 +222,7 @@ pub async fn check_update() -> Result<UpdateInfo, String> {
             has_update: false,
             current_version: current_version.clone(),
             latest_version: current_version,
-            download_url: "https://github.com/wstreet7/clipon/releases".to_string(),
+            download_url: "https://github.com/wst7/clipon/releases".to_string(),
             release_notes: None,
         });
     }
