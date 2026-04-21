@@ -6,6 +6,7 @@ import packageInfo from '../../package.json' with { type: 'json' };
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { listen } from '@tauri-apps/api/event';
 import { SearchBar } from "@/components/SearchBar";
 import { ClipboardList } from "@/components/ClipboardList";
 import { useClipboard } from "@/hooks/useClipboard";
@@ -18,6 +19,12 @@ interface UpdateInfo {
   latest_version: string;
   download_url: string;
   release_notes: string | null;
+}
+
+interface DownloadProgress {
+  downloaded: number;
+  total: number;
+  percent: number;
 }
 
 interface SettingsData {
@@ -52,6 +59,9 @@ export default function MainApp() {
   const [loadingSettings, setLoadingSettings] = useState(true);
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [downloadedPath, setDownloadedPath] = useState<string | null>(null);
 
   const applyTheme = (theme: string) => {
     const isDark =
@@ -150,9 +160,33 @@ export default function MainApp() {
     }
   };
 
-  const handleUpdate = () => {
-    if (updateInfo?.download_url) {
-      openUrl(updateInfo.download_url);
+
+  const handleDownloadUpdate = async () => {
+    setIsDownloading(true);
+    setDownloadProgress(0);
+
+    const unlisten = await listen<DownloadProgress>('download_progress', (event) => {
+      setDownloadProgress(event.payload.percent);
+    });
+
+    try {
+      const path = await invoke<string>("start_download_update");
+      setDownloadedPath(path);
+    } catch (error) {
+      console.error("Download failed:", error);
+      // Fallback: open browser URL
+      if (updateInfo?.download_url) {
+        openUrl(updateInfo.download_url);
+      }
+    } finally {
+      setIsDownloading(false);
+      unlisten();
+    }
+  };
+
+  const handleInstall = () => {
+    if (downloadedPath) {
+      invoke("open_installer", { path: downloadedPath });
     }
   };
 
@@ -342,18 +376,44 @@ export default function MainApp() {
                           <span className="text-sm text-green-500">{t('newVersion')}</span>
                           <span className="font-medium text-green-500">{updateInfo.latest_version}</span>
                         </div>
-                        <button
-                          onClick={handleUpdate}
-                          className="w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-sm transition-colors"
-                        >
-                          {t('download')}
-                        </button>
+
+                        {isDownloading ? (
+                          <div className="space-y-2">
+                            <div className="w-full bg-muted rounded-full h-2">
+                              <div
+                                className="bg-primary h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${downloadProgress}%` }}
+                              />
+                            </div>
+                            <p className="text-xs text-center text-muted-foreground">
+                              {t('downloading')} {downloadProgress.toFixed(1)}%
+                            </p>
+                          </div>
+                        ) : downloadedPath ? (
+                          <button
+                            onClick={handleInstall}
+                            className="w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-sm transition-colors"
+                          >
+                            {t('installUpdate')}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={handleDownloadUpdate}
+                            className="w-full px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-sm transition-colors"
+                          >
+                            {t('downloadUpdate')}
+                          </button>
+                        )}
                       </>
                     ) : (
                       <div className="text-center text-sm text-muted-foreground py-2">{t('upToDate')}</div>
                     )}
                     <button
-                      onClick={() => setUpdateInfo(null)}
+                      onClick={() => {
+                        setUpdateInfo(null);
+                        setDownloadedPath(null);
+                        setDownloadProgress(0);
+                      }}
                       className="w-full text-sm text-muted-foreground hover:text-foreground py-1 transition-colors"
                     >
                       {t('recheck')}
