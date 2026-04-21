@@ -70,21 +70,10 @@ export default function MainApp() {
       (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     const html = document.documentElement;
 
+    // 使用 Tauri 2 API 设置窗口主题，自动适配标题栏颜色
     const currentWindow = getCurrentWindow();
-    if (typeof (currentWindow as any).setTitleBarOverlay === 'function') {
-      if (isDark) {
-        // 深色主题 - 标题栏使用亮色标题文字和红绿灯
-        (currentWindow as any).setTitleBarOverlay({
-          color: "#00000000",
-          symbolColor: "#ffffff"
-        });
-      } else {
-        // 浅色主题 - 标题栏使用暗色标题文字和红绿灯
-        (currentWindow as any).setTitleBarOverlay({
-          color: "#00000000",
-          symbolColor: "#000000"
-        });
-      }
+    if (typeof currentWindow.setTheme === 'function') {
+      currentWindow.setTheme(isDark ? 'dark' : 'light');
     }
 
     if (isDark) {
