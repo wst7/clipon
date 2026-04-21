@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.0](https://github.com/wst7/clipon/compare/v1.0.6...v1.1.0) (2026-04-21)
+
+### ✨ Features | 新功能
+
+* 样式优化 ([8592699](https://github.com/wst7/clipon/commit/859269901f1b57a9297bd95e392796faa716136c))
+
 ## [1.0.6](https://github.com/wst7/clipon/compare/v1.0.5...v1.0.6) (2026-04-20)
 
 ### 🐛 Bug Fixes | Bug 修复
